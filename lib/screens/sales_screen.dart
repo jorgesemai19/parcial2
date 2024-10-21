@@ -44,6 +44,16 @@ class _SalesScreenState extends State<SalesScreen> {
     });
   }
 
+  // Función para limpiar el carrito
+  void _clearCart() {
+    setState(() {
+      _cart.clear();  // Vaciar el carrito
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El carrito ha sido vaciado.')),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,7 +154,19 @@ class _SalesScreenState extends State<SalesScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            // Nuevo botón para acceder al módulo de consulta de ventas
+            // Botón para limpiar el carrito
+            Center(
+              child: ElevatedButton(
+                onPressed: _clearCart,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,  // Fondo rojo para indicar que es acción de limpieza
+                  foregroundColor: Colors.white,  // Texto blanco
+                  minimumSize: const Size(200, 50),
+                ),
+                child: const Text('Limpiar Carrito'),
+              ),
+            ),
+            const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 onPressed: () {
