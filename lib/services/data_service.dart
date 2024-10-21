@@ -6,14 +6,22 @@ class DataService {
 
   factory DataService() => _instance;
 
-  DataService._internal();
+  DataService._internal() {
+    // Precargar productos cuando se inicializa el servicio
+    products = [
+      Product(idProducto: 1, nombre: 'Laptop', idCategoria: 1, precioVenta: 1200.0),
+      Product(idProducto: 2, nombre: 'Smartphone', idCategoria: 1, precioVenta: 800.0),
+      Product(idProducto: 3, nombre: 'Camiseta', idCategoria: 2, precioVenta: 20.0),
+      Product(idProducto: 4, nombre: 'Pantalones', idCategoria: 2, precioVenta: 35.0),
+    ];
+  }
 
   List<Category> categories = [
     Category(idCategoria: 1, nombre: 'Electrónica'),
     Category(idCategoria: 2, nombre: 'Ropa'),
   ];
 
-  List<Product> products = [];
+  List<Product> products = []; // Lista precargada con productos
 
   // Métodos CRUD para categorías
   void addCategory(Category category) {
