@@ -55,7 +55,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   
                   
                   return ListTile(
-                    title: Text(product.nombre),
+                    title: Text('${product.idProducto}:  ${product.nombre}'),
                     subtitle: Text(
                       'Precio: \$${product.precioVenta.toStringAsFixed(2)}\n'
                       'Categoría: ${category != null ? category.nombre : "No asignada"}', // Muestra "No asignada" si la categoría es null

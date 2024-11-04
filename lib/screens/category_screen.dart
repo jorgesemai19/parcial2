@@ -41,7 +41,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               itemBuilder: (context, index) {
                 var category = _dataService.categories[index];
                 return ListTile(
-                  title: Text(category.nombre),
+                  title: Text('${category.idCategoria}:  ${category.nombre}'), // Muestra el id y el nombre
                   trailing: IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: () {
