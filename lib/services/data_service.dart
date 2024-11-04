@@ -51,4 +51,16 @@ class DataService {
   void deleteProduct(int id) {
     products.removeWhere((prod) => prod.idProducto == id);
   }
+
+  // Método para obtener la categoría de un producto
+  Category? getCategoryForProduct(Product product) {
+  if (product.idCategoria == null) {
+    return null; // Si idCategoria es null, retorna null directamente
+  }
+  return categories.firstWhere(
+    (category) => category.idCategoria == product.idCategoria,
+  );
+}
+
+
 }

@@ -1,7 +1,7 @@
 class Product {
   int idProducto;
   String nombre;
-  int idCategoria; // Relación con Category
+  int? idCategoria; // Relación con Category
   double precioVenta;
 
   Product({

@@ -51,9 +51,15 @@ class _ProductScreenState extends State<ProductScreen> {
                 itemCount: _dataService.products.length,
                 itemBuilder: (context, index) {
                   var product = _dataService.products[index];
+                  var category = _dataService.getCategoryForProduct(product);
+                  
+                  
                   return ListTile(
                     title: Text(product.nombre),
-                    subtitle: Text('Precio: \$${product.precioVenta.toStringAsFixed(2)}'),
+                    subtitle: Text(
+                      'Precio: \$${product.precioVenta.toStringAsFixed(2)}\n'
+                      'Categoría: ${category != null ? category.nombre : "No asignada"}', // Muestra "No asignada" si la categoría es null
+                    ),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () {
