@@ -94,7 +94,7 @@ class _SalesQueryScreenState extends State<SalesQueryScreen> {
               itemBuilder: (context, index) {
                 final sale = _filteredSales[index];
                 return ListTile(
-                  title: Text('${sale.nombre} ${sale.apellido} - \$${sale.total.toStringAsFixed(2)}'),
+                  title: Text('${sale.id}:  ${sale.nombre} ${sale.apellido} - \$${sale.total.toStringAsFixed(2)}'),
                   subtitle: Text('Fecha: ${sale.fecha.toString().split(' ')[0]}'), // Solo mostrar la fecha
                   onTap: () {
                     // Navegar a la pantalla de detalles de la venta
