@@ -87,19 +87,46 @@ class _CartScreenState extends State<CartScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Navegar a la pantalla de finalización de compra
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CheckoutScreen(
-                      total: _total,
-                      cart: _productQuantities,
+                // Verificar si las cantidades seleccionadas no superan el stock
+                bool hasSufficientStock = true;
+                String insufficientProductName = '';
+
+                for (var entry in _productQuantities.entries) {
+                  final product = entry.key;
+                  final quantity = entry.value;
+
+                  if (quantity > product.cantidad) {
+                    hasSufficientStock = false;
+                    insufficientProductName = product.nombre;
+                    break;
+                  }
+                }
+
+                if (hasSufficientStock) {
+                  // Redirigir a la pantalla de finalización de compra si hay suficiente stock
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CheckoutScreen(
+                        total: _total,
+                        cart: _productQuantities,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  // Mostrar mensaje de error si no hay suficiente stock
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Stock insuficiente para el producto "$insufficientProductName".',
+                      ),
+                    ),
+                  );
+                }
               },
               child: const Text('Finalizar Compra'),
             ),
+
           ],
         ),
       ),
