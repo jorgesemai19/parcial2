@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:parcial2/models/product.dart';
 import 'package:parcial2/models/category.dart';
 import 'package:parcial2/services/data_service.dart';
@@ -17,11 +20,33 @@ class _ProductScreenState extends State<ProductScreen> {
   final _dataService = DataService();
   bool _isEditing = false;
 
+  String? _imagePath; // Ruta de la imagen seleccionada
+
   @override
   void dispose() {
     _nameController.dispose();
     _priceController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
+      if (pickedImage != null) {
+        // Guardar la imagen seleccionada localmente
+        final Directory appDir = await getApplicationDocumentsDirectory();
+        final String localPath = '${appDir.path}/${DateTime.now().millisecondsSinceEpoch}.png';
+        final File localImage = File(localPath);
+        await localImage.writeAsBytes(await pickedImage.readAsBytes());
+
+        setState(() {
+          _imagePath = localPath;
+        });
+      }
+    } catch (e) {
+      print('Error al seleccionar la imagen: $e');
+    }
   }
 
   @override
@@ -52,13 +77,15 @@ class _ProductScreenState extends State<ProductScreen> {
                 itemBuilder: (context, index) {
                   var product = _dataService.products[index];
                   var category = _dataService.getCategoryForProduct(product);
-                  
-                  
+
                   return ListTile(
+                    leading: product.imagenLocal != null
+                        ? Image.file(File(product.imagenLocal!))
+                        : const Icon(Icons.image, size: 50),
                     title: Text('${product.idProducto}:  ${product.nombre}'),
                     subtitle: Text(
                       'Precio: \$${product.precioVenta.toStringAsFixed(2)}\n'
-                      'Categoría: ${category != null ? category.nombre : "No asignada"}', // Muestra "No asignada" si la categoría es null
+                      'Categoría: ${category != null ? category.nombre : "No asignada"}',
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
@@ -106,6 +133,13 @@ class _ProductScreenState extends State<ProductScreen> {
           decoration: const InputDecoration(labelText: 'Precio del producto'),
           keyboardType: TextInputType.number,
         ),
+        const SizedBox(height: 10),
+        if (_imagePath != null)
+          Image.file(File(_imagePath!), height: 100, width: 100, fit: BoxFit.cover),
+        ElevatedButton(
+          onPressed: _selectImage,
+          child: const Text('Seleccionar Imagen'),
+        ),
         ElevatedButton(
           onPressed: _addProduct,
           child: const Text('Guardar Producto'),
@@ -124,9 +158,12 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   void _addProduct() {
-    if (_nameController.text.isEmpty || _priceController.text.isEmpty || _selectedCategory == null) {
+    if (_nameController.text.isEmpty ||
+        _priceController.text.isEmpty ||
+        _selectedCategory == null ||
+        _imagePath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor complete todos los campos')),
+        const SnackBar(content: Text('Por favor complete todos los campos, incluida la imagen')),
       );
       return;
     }
@@ -137,6 +174,7 @@ class _ProductScreenState extends State<ProductScreen> {
         nombre: _nameController.text,
         idCategoria: _selectedCategory!.idCategoria,
         precioVenta: double.tryParse(_priceController.text) ?? 0.0,
+        imagenLocal: _imagePath, // Agrega la ruta de la imagen
       );
       _dataService.addProduct(newProduct);
       _isEditing = false;
@@ -155,6 +193,7 @@ class _ProductScreenState extends State<ProductScreen> {
       _nameController.text = product.nombre;
       _priceController.text = product.precioVenta.toString();
       _selectedCategory = _dataService.categories.firstWhere((cat) => cat.idCategoria == product.idCategoria);
+      _imagePath = product.imagenLocal; // Carga la imagen existente
       _deleteProduct(product.idProducto);
       _isEditing = true;
     });
@@ -164,5 +203,6 @@ class _ProductScreenState extends State<ProductScreen> {
     _nameController.clear();
     _priceController.clear();
     _selectedCategory = null;
+    _imagePath = null;
   }
 }
