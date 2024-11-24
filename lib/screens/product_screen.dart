@@ -19,6 +19,8 @@ class _ProductScreenState extends State<ProductScreen> {
   Category? _selectedCategory;
   final _dataService = DataService();
   bool _isEditing = false;
+  final _quantityController = TextEditingController();
+
 
   String? _imagePath; // Ruta de la imagen seleccionada
 
@@ -85,7 +87,8 @@ class _ProductScreenState extends State<ProductScreen> {
                     title: Text('${product.idProducto}:  ${product.nombre}'),
                     subtitle: Text(
                       'Precio: \$${product.precioVenta.toStringAsFixed(2)}\n'
-                      'Categoría: ${category != null ? category.nombre : "No asignada"}',
+                      'Categoría: ${category != null ? category.nombre : "No asignada"}\n'
+                      'Cantidad: ${product.cantidad}', // Muestra la cantidad aquí
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
@@ -133,6 +136,11 @@ class _ProductScreenState extends State<ProductScreen> {
           decoration: const InputDecoration(labelText: 'Precio del producto'),
           keyboardType: TextInputType.number,
         ),
+        TextField(
+          controller: _quantityController,
+          decoration: const InputDecoration(labelText: 'Cantidad'),
+          keyboardType: TextInputType.number,
+        ),
         const SizedBox(height: 10),
         if (_imagePath != null)
           Image.file(File(_imagePath!), height: 100, width: 100, fit: BoxFit.cover),
@@ -157,13 +165,15 @@ class _ProductScreenState extends State<ProductScreen> {
     );
   }
 
+
   void _addProduct() {
     if (_nameController.text.isEmpty ||
         _priceController.text.isEmpty ||
         _selectedCategory == null ||
-        _imagePath == null) {
+        _imagePath == null ||
+        _quantityController.text.isEmpty) { // Verifica que la cantidad no esté vacía
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor complete todos los campos, incluida la imagen')),
+        const SnackBar(content: Text('Por favor complete todos los campos, incluida la cantidad')),
       );
       return;
     }
@@ -175,12 +185,14 @@ class _ProductScreenState extends State<ProductScreen> {
         idCategoria: _selectedCategory!.idCategoria,
         precioVenta: double.tryParse(_priceController.text) ?? 0.0,
         imagenLocal: _imagePath, // Agrega la ruta de la imagen
+        cantidad: int.tryParse(_quantityController.text) ?? 0, // Agrega la cantidad
       );
       _dataService.addProduct(newProduct);
       _isEditing = false;
       _clearForm();
     });
   }
+
 
   void _deleteProduct(int id) {
     setState(() {

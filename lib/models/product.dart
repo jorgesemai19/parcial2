@@ -4,7 +4,7 @@ class Product {
   int? idCategoria; // Relación con Category
   double precioVenta;
   String? imagenLocal; // Nueva propiedad para la imagen
-  //int cantidad;//cantidad disponible del producto
+  final int cantidad;//cantidad disponible del producto
 
   Product({
     required this.idProducto,
@@ -12,6 +12,6 @@ class Product {
     required this.idCategoria,
     required this.precioVenta,
     this.imagenLocal, // Es opcional, ya que algunos productos podrían no tener imagen
-    //this.cantidad,
+    this.cantidad=0,
   });
 }
