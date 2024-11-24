@@ -4,12 +4,14 @@ import 'package:parcial2/models/sale.dart';
 import 'package:parcial2/services/sales_service.dart';
 import 'package:uuid/uuid.dart'; // Para generar IDs únicos
 import 'package:parcial2/screens/sale_detail_screen.dart'; // Para mostrar el detalle de la venta
+import 'package:parcial2/services/data_service.dart'; // Para actualizar inventario
 
 class CheckoutScreen extends StatefulWidget {
   final double total;
   final Map<Product, int> cart;
 
-  const CheckoutScreen({Key? key, required this.total, required this.cart}) : super(key: key);
+  const CheckoutScreen({Key? key, required this.total, required this.cart})
+      : super(key: key);
 
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
@@ -22,6 +24,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   final _salesService = SalesService(); // Servicio de ventas
   final _uuid = Uuid(); // Para generar IDs únicos
+  final _dataService = DataService(); // Instancia del servicio de datos
 
   @override
   void dispose() {
@@ -37,10 +40,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final apellido = _apellidoController.text;
 
     if (cedula.isNotEmpty && nombre.isNotEmpty && apellido.isNotEmpty) {
-      // Generar un ID único para la venta
       final saleId = _uuid.v4();
 
-      // Crear la venta
       final sale = Sale(
         id: saleId,
         cedula: cedula,
@@ -51,13 +52,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         total: widget.total,
       );
 
-      // Registrar la venta
       _salesService.addSale(sale);
 
-      // Limpiar el carrito
+      widget.cart.forEach((product, quantity) {
+        // Buscar el producto en _dataService.products
+        final Product? productToUpdate = _dataService.products
+            .firstWhere((p) => p.idProducto == product.idProducto);
+
+        if (productToUpdate != null) {
+          // Actualizar la cantidad en el producto directamente en _dataService
+          productToUpdate.cantidad -= quantity;
+
+          // Evitar que la cantidad sea negativa
+          if (productToUpdate.cantidad < 0) {
+            productToUpdate.cantidad = 0;
+          }
+        } else {
+          debugPrint('Producto con ID ${product.idProducto} no encontrado en el inventario.');
+        }
+      });
       widget.cart.clear();
 
-      // Redirigir al detalle de la venta
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -69,7 +84,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         const SnackBar(content: Text('Por favor complete todos los campos')),
       );
     }
-  }
+}
+
 
   @override
   Widget build(BuildContext context) {

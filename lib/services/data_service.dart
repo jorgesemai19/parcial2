@@ -42,10 +42,11 @@ class DataService {
     products.add(product);
   }
 
-  void updateProduct(int id, String newName, double newPrice) {
+  void updateProduct(int id, String newName, double newPrice, int newCantidad) {
     var product = products.firstWhere((prod) => prod.idProducto == id);
     product.nombre = newName;
     product.precioVenta = newPrice;
+    product.cantidad = newCantidad;
   }
 
   void deleteProduct(int id) {
