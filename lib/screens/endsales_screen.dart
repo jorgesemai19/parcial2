@@ -5,6 +5,7 @@ import 'package:parcial2/services/sales_service.dart';
 import 'package:uuid/uuid.dart'; // Para generar IDs únicos
 import 'package:parcial2/screens/sale_detail_screen.dart'; // Para mostrar el detalle de la venta
 import 'package:parcial2/services/data_service.dart'; // Para actualizar inventario
+import 'package:parcial2/screens/sales_screen.dart'; // Para navegar a SalesScreen
 
 class CheckoutScreen extends StatefulWidget {
   final double total;
@@ -84,14 +85,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         const SnackBar(content: Text('Por favor complete todos los campos')),
       );
     }
-}
-
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Finalizar Compra'),
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          onPressed: () {
+            // Navegar a la pantalla de ventas
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SalesScreen(),
+              ),
+            );
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

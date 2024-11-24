@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parcial2/models/product.dart';
 import 'package:parcial2/screens/endsales_screen.dart'; // Importar la pantalla de finalización de compra
+import 'package:parcial2/screens/sales_screen.dart'; // Importar la pantalla de ventas
 
 class CartScreen extends StatefulWidget {
   final List<Product> cart;
@@ -48,6 +49,18 @@ class _CartScreenState extends State<CartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Carrito de Compras'),
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          onPressed: () {
+            // Navegar a la pantalla de ventas
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SalesScreen(),
+              ),
+            );
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -78,7 +91,10 @@ class _CartScreenState extends State<CartScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CheckoutScreen(total: _total, cart: _productQuantities),
+                    builder: (context) => CheckoutScreen(
+                      total: _total,
+                      cart: _productQuantities,
+                    ),
                   ),
                 );
               },
