@@ -23,7 +23,8 @@ class SalesService {
           Product(idProducto: 2, nombre: 'Smartphone', idCategoria: 1, precioVenta: 800.0 ): 1,
         },
         total: 2000.0,
-        deliveryOption: 'pickup'
+        deliveryOption: 'pickup',
+        deliveryLocation: null
       ),
       Sale(
         id: _uuid.v4(),
@@ -36,7 +37,8 @@ class SalesService {
           Product(idProducto: 4, nombre: 'Pantalones', idCategoria: 2, precioVenta: 35.0 ): 1,
         },
         total: 75.0,
-        deliveryOption: 'delivery'
+        deliveryOption: 'pickup',
+        deliveryLocation: null
       ),
     ]);
   }

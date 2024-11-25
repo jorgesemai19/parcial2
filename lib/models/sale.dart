@@ -1,4 +1,5 @@
-import 'product.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:parcial2/models/product.dart';
 
 class Sale {
   final String id;
@@ -8,7 +9,8 @@ class Sale {
   final DateTime fecha;
   final Map<Product, int> productos;
   final double total;
-  final String deliveryOption; // Nueva opción: "delivery" o "pickup"
+  final String deliveryOption; // Opción de entrega
+  final LatLng? deliveryLocation; // Ubicación de entrega (si es delivery)
 
   Sale({
     required this.id,
@@ -18,6 +20,7 @@ class Sale {
     required this.fecha,
     required this.productos,
     required this.total,
-    required this.deliveryOption, // Requerido
+    required this.deliveryOption,
+    this.deliveryLocation, // Opcional
   });
 }

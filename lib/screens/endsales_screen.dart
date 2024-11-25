@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart'; // Para manejar el mapa
 import 'package:parcial2/models/product.dart';
 import 'package:parcial2/models/sale.dart';
 import 'package:parcial2/services/sales_service.dart';
@@ -6,6 +7,7 @@ import 'package:uuid/uuid.dart'; // Para generar IDs únicos
 import 'package:parcial2/screens/sale_detail_screen.dart'; // Para mostrar el detalle de la venta
 import 'package:parcial2/services/data_service.dart'; // Para actualizar inventario
 import 'package:parcial2/screens/sales_screen.dart'; // Para navegar a SalesScreen
+
 
 class CheckoutScreen extends StatefulWidget {
   final double total;
@@ -17,6 +19,7 @@ class CheckoutScreen extends StatefulWidget {
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
 }
+
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final _cedulaController = TextEditingController();
   final _nombreController = TextEditingController();
@@ -27,6 +30,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _dataService = DataService();
 
   String _deliveryOption = 'pickup'; // Valor predeterminado
+  LatLng? _deliveryLocation; // Ubicación seleccionada
 
   @override
   void dispose() {
@@ -42,6 +46,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final apellido = _apellidoController.text;
 
     if (cedula.isNotEmpty && nombre.isNotEmpty && apellido.isNotEmpty) {
+      if (_deliveryOption == 'delivery' && _deliveryLocation == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Seleccione una ubicación para delivery')),
+        );
+        return;
+      }
+
       final saleId = _uuid.v4();
 
       final sale = Sale(
@@ -53,6 +64,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         productos: Map.from(widget.cart),
         total: widget.total,
         deliveryOption: _deliveryOption, // Incluye la opción seleccionada
+        deliveryLocation: _deliveryLocation, // Guarda la ubicación seleccionada
       );
 
       _salesService.addSale(sale);
@@ -83,6 +95,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor complete todos los campos')),
       );
+    }
+  }
+
+  void _selectDeliveryLocation() async {
+    final LatLng? selectedLocation = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapSelectionScreen(),
+      ),
+    );
+
+    if (selectedLocation != null) {
+      setState(() {
+        _deliveryLocation = selectedLocation;
+      });
     }
   }
 
@@ -125,6 +152,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               onChanged: (value) {
                 setState(() {
                   _deliveryOption = value!;
+                  if (_deliveryOption == 'delivery') {
+                    _selectDeliveryLocation();
+                  }
                 });
               },
               items: const [
@@ -139,6 +169,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ],
             ),
             const SizedBox(height: 20),
+            if (_deliveryLocation != null)
+              Text(
+                'Ubicación seleccionada: ${_deliveryLocation!.latitude}, ${_deliveryLocation!.longitude}',
+              ),
+            const SizedBox(height: 20),
             Text(
               'Total a pagar: \$${widget.total.toStringAsFixed(2)}',
               style: const TextStyle(
@@ -152,6 +187,50 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// Pantalla de selección de mapa
+class MapSelectionScreen extends StatefulWidget {
+  @override
+  _MapSelectionScreenState createState() => _MapSelectionScreenState();
+}
+
+class _MapSelectionScreenState extends State<MapSelectionScreen> {
+  LatLng? _selectedLocation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Seleccionar Ubicación')),
+      body: GoogleMap(
+        onTap: (LatLng location) {
+          setState(() {
+            _selectedLocation = location;
+          });
+        },
+        initialCameraPosition: const CameraPosition(
+          target: LatLng(0, 0), // Centrado inicial
+          zoom: 2,
+        ),
+        markers: _selectedLocation == null
+            ? {}
+            : {
+                Marker(
+                  markerId: const MarkerId('selectedLocation'),
+                  position: _selectedLocation!,
+                ),
+              },
+      ),
+      floatingActionButton: _selectedLocation == null
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                Navigator.pop(context, _selectedLocation);
+              },
+              child: const Icon(Icons.check),
+            ),
     );
   }
 }
