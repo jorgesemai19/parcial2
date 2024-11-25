@@ -28,22 +28,93 @@ class _CategoryScreenState extends State<CategoryScreen> {
               crossAxisCount: 4,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.computer),
+                  icon: const Icon(Icons.computer), // Electrónica
                   onPressed: () => Navigator.of(context).pop(Icons.computer),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.sports_soccer),
+                  icon: const Icon(Icons.sports_soccer), // Deportes
                   onPressed: () => Navigator.of(context).pop(Icons.sports_soccer),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.kitchen),
+                  icon: const Icon(Icons.kitchen), // Electrodomésticos
                   onPressed: () => Navigator.of(context).pop(Icons.kitchen),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.school),
+                  icon: const Icon(Icons.school), // Papelería
                   onPressed: () => Navigator.of(context).pop(Icons.school),
                 ),
-                // Agregar más íconos aquí si es necesario
+                IconButton(
+                  icon: const Icon(Icons.phone_android), // Teléfonos móviles
+                  onPressed: () => Navigator.of(context).pop(Icons.phone_android),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.watch), // Relojes
+                  onPressed: () => Navigator.of(context).pop(Icons.watch),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chair), // Muebles
+                  onPressed: () => Navigator.of(context).pop(Icons.chair),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.book), // Libros
+                  onPressed: () => Navigator.of(context).pop(Icons.book),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.directions_car), // Autos
+                  onPressed: () => Navigator.of(context).pop(Icons.directions_car),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.shopping_bag), // Ropa
+                  onPressed: () => Navigator.of(context).pop(Icons.shopping_bag),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.pets), // Mascotas
+                  onPressed: () => Navigator.of(context).pop(Icons.pets),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.medical_services), // Salud
+                  onPressed: () => Navigator.of(context).pop(Icons.medical_services),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.toys), // Juguetes
+                  onPressed: () => Navigator.of(context).pop(Icons.toys),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.lightbulb), // Iluminación
+                  onPressed: () => Navigator.of(context).pop(Icons.lightbulb),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.headphones), // Accesorios
+                  onPressed: () => Navigator.of(context).pop(Icons.headphones),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.restaurant), // Cocina
+                  onPressed: () => Navigator.of(context).pop(Icons.restaurant),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.beach_access), // Playa
+                  onPressed: () => Navigator.of(context).pop(Icons.beach_access),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.fitness_center), // Gimnasio
+                  onPressed: () => Navigator.of(context).pop(Icons.fitness_center),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.music_note), // Música
+                  onPressed: () => Navigator.of(context).pop(Icons.music_note),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.umbrella), // Accesorios de lluvia
+                  onPressed: () => Navigator.of(context).pop(Icons.umbrella),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.landscape), // Jardinería
+                  onPressed: () => Navigator.of(context).pop(Icons.landscape),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.coffee), // Alimentos y bebidas
+                  onPressed: () => Navigator.of(context).pop(Icons.coffee),
+                ),
               ],
             ),
           ),
