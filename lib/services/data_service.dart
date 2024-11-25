@@ -17,8 +17,8 @@ class DataService {
   }
 
   List<Category> categories = [
-    Category(idCategoria: 1, nombre: 'Electrónica',icono:null),
-    Category(idCategoria: 2, nombre: 'Ropa',icono:null),
+    Category(idCategoria: 1, nombre: 'Electrónica'),
+    Category(idCategoria: 2, nombre: 'Ropa'),
   ];
 
   List<Product> products = []; // Lista precargada con productos
