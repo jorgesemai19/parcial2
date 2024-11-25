@@ -10,38 +10,40 @@ class CategoryScreen extends StatefulWidget {
 class _CategoryScreenState extends State<CategoryScreen> {
   final _nameController = TextEditingController();
   final _dataService = DataService();
-  IconData? _selectedIcon; // Para almacenar el ícono seleccionado
+  IconData? _selectedIcon;
+  bool _isEditing = false; // Estado para controlar el modo de edición
+  int? _editingCategoryId; // ID de la categoría que se está editando
 
   void _selectIcon(BuildContext context) async {
     IconData? icon = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Selecciona un ícono'),
+          title: const Text('Selecciona un ícono'),
           content: Container(
-            height: 300, // Establece una altura fija para el Container
-            width: double.maxFinite, // Ancho máximo disponible
+            height: 300,
+            width: double.maxFinite,
             child: GridView.count(
-              shrinkWrap: true, // Esto permitirá que el GridView ajuste su tamaño
+              shrinkWrap: true,
               crossAxisCount: 4,
               children: [
                 IconButton(
-                  icon: Icon(Icons.computer),
+                  icon: const Icon(Icons.computer),
                   onPressed: () => Navigator.of(context).pop(Icons.computer),
                 ),
                 IconButton(
-                  icon: Icon(Icons.sports_soccer),
+                  icon: const Icon(Icons.sports_soccer),
                   onPressed: () => Navigator.of(context).pop(Icons.sports_soccer),
                 ),
                 IconButton(
-                  icon: Icon(Icons.kitchen),
+                  icon: const Icon(Icons.kitchen),
                   onPressed: () => Navigator.of(context).pop(Icons.kitchen),
                 ),
                 IconButton(
-                  icon: Icon(Icons.school),
+                  icon: const Icon(Icons.school),
                   onPressed: () => Navigator.of(context).pop(Icons.school),
                 ),
-                // Puedes agregar más íconos aquí
+                // Agregar más íconos aquí si es necesario
               ],
             ),
           ),
@@ -51,81 +53,138 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
     if (icon != null) {
       setState(() {
-        _selectedIcon = icon; // Guardamos el ícono seleccionado
+        _selectedIcon = icon;
       });
     }
   }
 
-
-  // Función para agregar la categoría con el ícono seleccionado
-  void _addCategory() {
+  void _addOrUpdateCategory() {
     if (_selectedIcon != null && _nameController.text.isNotEmpty) {
       setState(() {
-        _dataService.addCategory(Category(
-          idCategoria: _dataService.categories.length + 1,
-          nombre: _nameController.text,
-          icono: _selectedIcon!, // Asignamos el ícono seleccionado
-        ));
-        _nameController.clear();
-        _selectedIcon = null; // Reiniciamos el ícono después de agregar
+        if (_isEditing && _editingCategoryId != null) {
+          // Actualizar la categoría existente
+          final categoryIndex = _dataService.categories.indexWhere((cat) => cat.idCategoria == _editingCategoryId);
+          if (categoryIndex != -1) {
+            _dataService.categories[categoryIndex] = Category(
+              idCategoria: _editingCategoryId!,
+              nombre: _nameController.text,
+              icono: _selectedIcon!,
+            );
+          }
+        } else {
+          // Agregar nueva categoría
+          _dataService.addCategory(Category(
+            idCategoria: _dataService.categories.length + 1,
+            nombre: _nameController.text,
+            icono: _selectedIcon!,
+          ));
+        }
+        _clearForm();
+        _isEditing = false;
       });
     } else {
-      // Mostrar un mensaje de error si no se seleccionó un ícono o el nombre está vacío
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor, ingrese un nombre y seleccione un ícono')),
+        const SnackBar(content: Text('Por favor, ingrese un nombre y seleccione un ícono')),
       );
     }
+  }
+
+  void _editCategory(Category category) {
+    setState(() {
+      _isEditing = true;
+      _editingCategoryId = category.idCategoria;
+      _nameController.text = category.nombre;
+      _selectedIcon = category.icono;
+    });
+  }
+
+  void _clearForm() {
+    _nameController.clear();
+    _selectedIcon = null;
+    _editingCategoryId = null;
+    _isEditing = false;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Categorías'),
+        title: const Text('Categorías'),
       ),
       body: Column(
         children: [
-          TextField(
-            controller: _nameController,
-            decoration: InputDecoration(labelText: 'Nombre de la categoría'),
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(_selectedIcon ?? Icons.add_a_photo), // Ícono por defecto
-                onPressed: () {
-                  _selectIcon(context); // Mostrar el selector de íconos
-                },
-              ),
-              Text('Seleccionar ícono'),
-            ],
-          ),
           ElevatedButton(
-            onPressed: _addCategory, // Usamos la nueva función para agregar la categoría
-            child: Text('Agregar Categoría'),
+            onPressed: () {
+              setState(() {
+                _isEditing = true; // Mostrar el formulario para agregar/editar categoría
+                _clearForm();
+              });
+            },
+            child: const Text('Agregar Categoría'),
           ),
+          const SizedBox(height: 20),
+          if (_isEditing) _buildCategoryForm(),
+          const SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
               itemCount: _dataService.categories.length,
               itemBuilder: (context, index) {
                 var category = _dataService.categories[index];
                 return ListTile(
-                  leading: Icon(category.icono), // Mostrar el ícono
-                  title: Text('${category.idCategoria}:  ${category.nombre}'), // Muestra el id y el nombre
+                  leading: Icon(category.icono),
+                  title: Text('${category.idCategoria}:  ${category.nombre}'),
                   trailing: IconButton(
-                    icon: Icon(Icons.delete),
+                    icon: const Icon(Icons.delete),
                     onPressed: () {
                       setState(() {
                         _dataService.deleteCategory(category.idCategoria);
                       });
                     },
                   ),
+                  onTap: () {
+                    _editCategory(category); // Editar categoría al hacer tap
+                  },
                 );
               },
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCategoryForm() {
+    return Column(
+      children: [
+        TextField(
+          controller: _nameController,
+          decoration: const InputDecoration(labelText: 'Nombre de la categoría'),
+        ),
+        Row(
+          children: [
+            IconButton(
+              icon: Icon(_selectedIcon ?? Icons.add_a_photo),
+              onPressed: () {
+                _selectIcon(context);
+              },
+            ),
+            const Text('Seleccionar ícono'),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: _addOrUpdateCategory,
+          child: Text(_isEditing ? 'Actualizar Categoría' : 'Agregar Categoría'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _clearForm();
+              _isEditing = false; // Ocultar formulario
+            });
+          },
+          child: const Text('Cancelar'),
+        ),
+      ],
     );
   }
 }
