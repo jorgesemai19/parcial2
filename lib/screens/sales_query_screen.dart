@@ -16,6 +16,7 @@ class _SalesQueryScreenState extends State<SalesQueryScreen> {
   List<Sale> _filteredSales = [];
   String _clientSearchQuery = '';
   DateTime? _selectedDate;
+  String? _selectedDeliveryOption; // Puede ser 'delivery', 'pickup' o null
 
   @override
   void initState() {
@@ -24,20 +25,30 @@ class _SalesQueryScreenState extends State<SalesQueryScreen> {
     _filteredSales = _sales; // Inicialmente mostrar todas
   }
 
-  // Filtrar ventas por fecha y cliente
+  // Filtrar ventas por fecha, cliente y tipo de entrega
   void _filterSales() {
     setState(() {
       _filteredSales = _sales.where((sale) {
+        // Coincidencias por cliente
         final matchesClient = sale.nombre.toLowerCase().contains(_clientSearchQuery.toLowerCase()) ||
             sale.apellido.toLowerCase().contains(_clientSearchQuery.toLowerCase()) ||
             sale.cedula.toLowerCase().contains(_clientSearchQuery.toLowerCase());
-        final matchesDate = _selectedDate == null || sale.fecha.year == _selectedDate!.year &&
-            sale.fecha.month == _selectedDate!.month &&
-            sale.fecha.day == _selectedDate!.day;
-        return matchesClient && matchesDate;
+        
+        // Coincidencias por fecha
+        final matchesDate = _selectedDate == null ||
+            (sale.fecha.year == _selectedDate!.year &&
+                sale.fecha.month == _selectedDate!.month &&
+                sale.fecha.day == _selectedDate!.day);
+        
+        // Coincidencias por tipo de entrega
+        final matchesDeliveryOption = _selectedDeliveryOption == null || 
+            sale.deliveryOption.toLowerCase() == _selectedDeliveryOption!.toLowerCase();
+        
+        return matchesClient && matchesDate && matchesDeliveryOption;
       }).toList();
     });
   }
+
 
   // Mostrar un date picker para seleccionar la fecha
   Future<void> _selectDate(BuildContext context) async {
@@ -95,7 +106,11 @@ class _SalesQueryScreenState extends State<SalesQueryScreen> {
                 final sale = _filteredSales[index];
                 return ListTile(
                   title: Text('${sale.nombre} ${sale.apellido} - \$${sale.total.toStringAsFixed(2)}'),
-                  subtitle: Text('Fecha: ${sale.fecha.toString().split(' ')[0]}   id: ${sale.id}'), // Solo mostrar la fecha
+                  subtitle: Text(
+                    'Fecha: ${sale.fecha.toString().split(' ')[0]} - '
+                    'Tipo: ${sale.deliveryOption} - '
+                    'ID: ${sale.id}',
+                  ),
                   onTap: () {
                     // Navegar a la pantalla de detalles de la venta
                     Navigator.push(
@@ -108,7 +123,7 @@ class _SalesQueryScreenState extends State<SalesQueryScreen> {
                 );
               },
             ),
-          ),
+          )
         ],
       ),
     );

@@ -17,15 +17,16 @@ class CheckoutScreen extends StatefulWidget {
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
 }
-
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final _cedulaController = TextEditingController();
   final _nombreController = TextEditingController();
   final _apellidoController = TextEditingController();
 
-  final _salesService = SalesService(); // Servicio de ventas
-  final _uuid = Uuid(); // Para generar IDs únicos
-  final _dataService = DataService(); // Instancia del servicio de datos
+  final _salesService = SalesService();
+  final _uuid = Uuid();
+  final _dataService = DataService();
+
+  String _deliveryOption = 'pickup'; // Valor predeterminado
 
   @override
   void dispose() {
@@ -51,25 +52,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         fecha: DateTime.now(),
         productos: Map.from(widget.cart),
         total: widget.total,
+        deliveryOption: _deliveryOption, // Incluye la opción seleccionada
       );
 
       _salesService.addSale(sale);
 
       widget.cart.forEach((product, quantity) {
-        // Buscar el producto en _dataService.products
         final Product? productToUpdate = _dataService.products
             .firstWhere((p) => p.idProducto == product.idProducto);
 
         if (productToUpdate != null) {
-          // Actualizar la cantidad en el producto directamente en _dataService
           productToUpdate.cantidad -= quantity;
-
-          // Evitar que la cantidad sea negativa
           if (productToUpdate.cantidad < 0) {
             productToUpdate.cantidad = 0;
           }
         } else {
-          debugPrint('Producto con ID ${product.idProducto} no encontrado en el inventario.');
+          debugPrint(
+              'Producto con ID ${product.idProducto} no encontrado en el inventario.');
         }
       });
       widget.cart.clear();
@@ -95,7 +94,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         leading: IconButton(
           icon: const Icon(Icons.home),
           onPressed: () {
-            // Navegar a la pantalla de ventas
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -122,9 +120,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               decoration: const InputDecoration(labelText: 'Apellido'),
             ),
             const SizedBox(height: 20),
+            DropdownButton<String>(
+              value: _deliveryOption,
+              onChanged: (value) {
+                setState(() {
+                  _deliveryOption = value!;
+                });
+              },
+              items: const [
+                DropdownMenuItem(
+                  value: 'pickup',
+                  child: Text('Pickup'),
+                ),
+                DropdownMenuItem(
+                  value: 'delivery',
+                  child: Text('Delivery'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             Text(
               'Total a pagar: \$${widget.total.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
