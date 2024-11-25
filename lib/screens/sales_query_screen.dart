@@ -25,30 +25,30 @@ class _SalesQueryScreenState extends State<SalesQueryScreen> {
     _filteredSales = _sales; // Inicialmente mostrar todas
   }
 
-  // Filtrar ventas por fecha, cliente y tipo de entrega
+  // Filtrar ventas por cliente, fecha y tipo de entrega
   void _filterSales() {
     setState(() {
       _filteredSales = _sales.where((sale) {
         // Coincidencias por cliente
-        final matchesClient = sale.nombre.toLowerCase().contains(_clientSearchQuery.toLowerCase()) ||
+        final matchesClient = _clientSearchQuery.isEmpty ||
+            sale.nombre.toLowerCase().contains(_clientSearchQuery.toLowerCase()) ||
             sale.apellido.toLowerCase().contains(_clientSearchQuery.toLowerCase()) ||
             sale.cedula.toLowerCase().contains(_clientSearchQuery.toLowerCase());
-        
+
         // Coincidencias por fecha
         final matchesDate = _selectedDate == null ||
             (sale.fecha.year == _selectedDate!.year &&
                 sale.fecha.month == _selectedDate!.month &&
                 sale.fecha.day == _selectedDate!.day);
-        
+
         // Coincidencias por tipo de entrega
-        final matchesDeliveryOption = _selectedDeliveryOption == null || 
+        final matchesDeliveryOption = _selectedDeliveryOption == null ||
             sale.deliveryOption.toLowerCase() == _selectedDeliveryOption!.toLowerCase();
-        
+
         return matchesClient && matchesDate && matchesDeliveryOption;
       }).toList();
     });
   }
-
 
   // Mostrar un date picker para seleccionar la fecha
   Future<void> _selectDate(BuildContext context) async {
@@ -96,6 +96,25 @@ class _SalesQueryScreenState extends State<SalesQueryScreen> {
             child: ElevatedButton(
               onPressed: () => _selectDate(context),
               child: const Text('Seleccionar fecha'),
+            ),
+          ),
+          // Dropdown para seleccionar tipo de entrega
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: DropdownButton<String>(
+              value: _selectedDeliveryOption,
+              hint: const Text('Seleccionar tipo de entrega'),
+              items: [
+                const DropdownMenuItem(value: null, child: Text('Todos')), // Opción para mostrar todos
+                const DropdownMenuItem(value: 'delivery', child: Text('Delivery')),
+                const DropdownMenuItem(value: 'pickup', child: Text('Pickup')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _selectedDeliveryOption = value;
+                  _filterSales();
+                });
+              },
             ),
           ),
           // Mostrar ventas filtradas
