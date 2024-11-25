@@ -184,15 +184,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       ),
       body: Column(
         children: [
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _isEditing = true; // Mostrar el formulario para agregar/editar categoría
-                _clearForm();
-              });
-            },
-            child: const Text('Agregar Categoría'),
-          ),
+          _buildCategoryForm(),
           const SizedBox(height: 20),
           if (_isEditing) _buildCategoryForm(),
           const SizedBox(height: 20),
