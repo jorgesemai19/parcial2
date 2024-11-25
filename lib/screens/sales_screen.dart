@@ -118,7 +118,26 @@ class _SalesScreenState extends State<SalesScreen> {
                     trailing: IconButton(
                       icon: const Icon(Icons.add_shopping_cart),
                       onPressed: () {
-                        _addToCart(product);
+                        // Obtener la cantidad actual en el carrito
+                        final cartQuantity = _cart.where((item) => item.idProducto == product.idProducto).length;
+
+                        // Comparar con el stock disponible
+                        if (cartQuantity < product.cantidad) {
+                          _addToCart(product); // Llama a la función para agregar al carrito
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('${product.nombre} agregado al carrito.'),
+                            ),
+                          );
+                        } else {
+                          // Mostrar mensaje de stock insuficiente
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Stock insuficiente para ${product.nombre}.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       },
                     ),
                   );
