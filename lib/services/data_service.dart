@@ -1,5 +1,6 @@
 import 'package:parcial2/models/category.dart';
 import 'package:parcial2/models/product.dart';
+import 'package:flutter/material.dart';
 
 class DataService {
   static final DataService _instance = DataService._internal();
@@ -16,12 +17,17 @@ class DataService {
     ];
   }
 
+  // Lista de categorías
   List<Category> categories = [
-    Category(idCategoria: 1, nombre: 'Electrónica'),
-    Category(idCategoria: 2, nombre: 'Ropa'),
+    Category(idCategoria: 1, nombre: 'Electrónica', icono: Icons.computer),
+    Category(idCategoria: 2, nombre: 'Ropa', icono: Icons.checkroom),
   ];
 
-  List<Product> products = []; // Lista precargada con productos
+  // Getter para acceder a las categorías
+  List<Category> get categorias => categories;
+
+  // Lista de productos
+  List<Product> products = [];
 
   // Métodos CRUD para categorías
   void addCategory(Category category) {
@@ -35,6 +41,19 @@ class DataService {
 
   void deleteCategory(int id) {
     categories.removeWhere((cat) => cat.idCategoria == id);
+  }
+
+  // Método para obtener el ícono de una categoría
+  IconData getIconForCategory(int? idCategoria) {
+    if (idCategoria != null) {
+      final categoria = categories.firstWhere(
+        (categoria) => categoria.idCategoria == idCategoria,
+        orElse: () => Category(idCategoria: 0, nombre: 'Genérico', icono: Icons.category),
+      );
+      return categoria.icono;
+    } else {
+      return Icons.category; // Ícono genérico si no se especifica categoría
+    }
   }
 
   // Métodos CRUD para productos
@@ -55,13 +74,9 @@ class DataService {
 
   // Método para obtener la categoría de un producto
   Category? getCategoryForProduct(Product product) {
-  if (product.idCategoria == null) {
-    return null; // Si idCategoria es null, retorna null directamente
+    return categories.firstWhere(
+      (category) => category.idCategoria == product.idCategoria,
+      orElse: () => Category(idCategoria: 0, nombre: 'Sin categoría', icono: Icons.category),
+    );
   }
-  return categories.firstWhere(
-    (category) => category.idCategoria == product.idCategoria,
-  );
-}
-
-
 }

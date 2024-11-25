@@ -111,8 +111,10 @@ class _SalesScreenState extends State<SalesScreen> {
                 itemBuilder: (context, index) {
                   final product = _filteredProducts[index];
                   return ListTile(
+                    leading: Icon(_dataService.getIconForCategory(product.idCategoria), color: Colors.grey),
                     title: Text(product.nombre),
-                    subtitle: Text('Precio: \$${product.precioVenta.toStringAsFixed(2)}\t\t\tCantidad: ${product.cantidad.toStringAsFixed(0)}'),
+                    subtitle: Text(
+                        'Precio: \$${product.precioVenta.toStringAsFixed(2)}\t\t\tCantidad: ${product.cantidad.toStringAsFixed(0)}'),
                     trailing: IconButton(
                       icon: const Icon(Icons.add_shopping_cart),
                       onPressed: () {

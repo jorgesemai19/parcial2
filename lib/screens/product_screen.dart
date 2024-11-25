@@ -90,11 +90,22 @@ class _ProductScreenState extends State<ProductScreen> {
                       'Categoría: ${category != null ? category.nombre : "No asignada"}\n'
                       'Cantidad: ${product.cantidad}', // Muestra la cantidad aquí
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        _deleteProduct(product.idProducto);
-                      },
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (category != null)
+                          Icon(
+                            category.icono, // Asegúrate de que la categoría tenga un atributo `icono`
+                            size: 24,
+                            color: Colors.grey,
+                          ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            _deleteProduct(product.idProducto);
+                          },
+                        ),
+                      ],
                     ),
                     onTap: () {
                       _editProduct(product);
